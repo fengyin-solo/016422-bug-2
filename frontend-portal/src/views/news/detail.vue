@@ -1,5 +1,13 @@
 <template>
   <div class="news-detail-page">
+    <!-- 文章不存在 -->
+    <div v-if="!newsDetail" class="article-not-found">
+      <el-icon :size="64"><Document /></el-icon>
+      <h2>文章不存在或已被删除</h2>
+      <el-button type="primary" round @click="router.push('/news')">返回新闻列表</el-button>
+    </div>
+
+    <template v-else>
     <!-- 文章头部 -->
     <header class="article-hero">
       <div class="hero-content">
@@ -16,7 +24,7 @@
     <div class="detail-container">
       <!-- 返回按钮 -->
       <div class="back-nav">
-        <el-button text @click="router.back()">
+        <el-button text @click="goBack">
           <el-icon><ArrowLeft /></el-icon> 返回列表
         </el-button>
       </div>
@@ -75,9 +83,9 @@
           <div class="sidebar-card">
             <h3>相关推荐</h3>
             <div class="related-list">
-              <div 
-                v-for="item in relatedNews" 
-                :key="item.id" 
+              <div
+                v-for="item in relatedNews"
+                :key="item.id"
                 class="related-item"
                 @click="router.push(`/news/${item.id}`)"
               >
@@ -92,14 +100,16 @@
         </aside>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { NewsItem } from '@/types'
+import { getNewsById, getRelatedNews } from '@/data/news'
 
 const router = useRouter()
 const route = useRoute()
@@ -108,61 +118,41 @@ const handleNotImplemented = () => {
   ElMessage.info('功能开发中，敬请期待')
 }
 
-const newsDetail = ref<NewsItem>({
-  id: 1,
-  title: '公司荣获2024年度最佳创新企业奖',
-  summary: '在刚刚结束的行业峰会上，我公司凭借卓越的创新能力和优质的产品服务，荣获年度最佳创新企业奖。这是对我们团队辛勤付出的最好肯定，也是对未来发展的巨大鼓励。',
-  content: '',
-  coverImage: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=400&fit=crop',
-  category: '公司新闻',
-  author: '管理员',
-  viewCount: 1256,
-  publishTime: '2024-03-15',
-  createTime: '2024-03-15',
-  updateTime: '2024-03-15'
-})
+// 按地址中的文章 id 取对应文章
+const newsDetail = ref<NewsItem | null>(null)
+const relatedNews = ref<NewsItem[]>([])
 
-const relatedNews = ref<NewsItem[]>([
-  {
-    id: 2,
-    title: '新产品发布会圆满成功',
-    summary: '',
-    content: '',
-    coverImage: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=200&h=150&fit=crop',
-    category: '产品动态',
-    author: '管理员',
-    viewCount: 892,
-    publishTime: '2024-03-10',
-    createTime: '2024-03-10',
-    updateTime: '2024-03-10'
-  },
-  {
-    id: 3,
-    title: '行业发展趋势分析报告发布',
-    summary: '',
-    content: '',
-    coverImage: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=200&h=150&fit=crop',
-    category: '行业资讯',
-    author: '管理员',
-    viewCount: 654,
-    publishTime: '2024-03-05',
-    createTime: '2024-03-05',
-    updateTime: '2024-03-05'
-  },
-  {
-    id: 4,
-    title: 'Vue 3 组合式 API 最佳实践',
-    summary: '',
-    content: '',
-    coverImage: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=200&h=150&fit=crop',
-    category: '技术分享',
-    author: '技术团队',
-    viewCount: 2341,
-    publishTime: '2024-03-01',
-    createTime: '2024-03-01',
-    updateTime: '2024-03-01'
+const currentId = computed(() => Number(route.params.id))
+
+const loadDetail = (id: number) => {
+  const detail = getNewsById(id)
+  newsDetail.value = detail ?? null
+  // 相关推荐：站内真实存在且排除当前文章
+  relatedNews.value = detail ? getRelatedNews(id) : []
+
+  if (detail) {
+    document.title = `${detail.title} - 门户网站`
   }
-])
+}
+
+// 首次加载及同组件内切换文章（如点击相关推荐）时都要重新取数
+watch(currentId, (id) => loadDetail(id), { immediate: true })
+
+// 返回列表：有站内历史则回退到刚才那份列表；
+// 直接打开分享链接（无历史）时回到新闻列表页并带上当前筛选条件
+const goBack = () => {
+  if (window.history.state && window.history.state.back) {
+    router.back()
+  } else {
+    router.push({
+      path: '/news',
+      query: {
+        category: route.query.category ?? '',
+        keyword: route.query.keyword ?? ''
+      }
+    })
+  }
+}
 
 const formatDate = (dateStr: string) => {
   return new Date(dateStr).toLocaleDateString('zh-CN', {
@@ -171,10 +161,6 @@ const formatDate = (dateStr: string) => {
     day: 'numeric'
   })
 }
-
-onMounted(() => {
-  console.log('News ID:', route.params.id)
-})
 </script>
 
 <style lang="scss" scoped>
@@ -182,6 +168,25 @@ onMounted(() => {
   padding-top: $header-height;
   background: $bg-color-light;
   min-height: 100vh;
+}
+
+// ==================== 文章不存在 ====================
+.article-not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-4xl $spacing-lg;
+  color: $text-color-secondary;
+
+  .el-icon {
+    opacity: 0.3;
+  }
+
+  h2 {
+    font-size: $font-size-xl;
+    color: $text-color-primary;
+  }
 }
 
 // ==================== 文章头部 ====================

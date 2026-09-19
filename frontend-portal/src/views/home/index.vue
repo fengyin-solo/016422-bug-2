@@ -214,7 +214,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import type { NewsItem, ProductItem } from '@/types'
+import type { ProductItem } from '@/types'
+import { getLatestNews } from '@/data/news'
 
 const router = useRouter()
 
@@ -276,47 +277,7 @@ const products = ref<ProductItem[]>([
   }
 ])
 
-const latestNews = ref<NewsItem[]>([
-  {
-    id: 1,
-    title: '公司荣获2024年度最佳创新企业奖',
-    summary: '在刚刚结束的行业峰会上，我公司凭借卓越的创新能力荣获年度最佳创新企业奖。',
-    content: '',
-    coverImage: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=600&h=400&fit=crop',
-    category: '公司新闻',
-    author: '管理员',
-    viewCount: 1256,
-    publishTime: '2024-03-15',
-    createTime: '2024-03-15',
-    updateTime: '2024-03-15'
-  },
-  {
-    id: 2,
-    title: '新一代数字化平台正式发布',
-    summary: '我公司全新研发的数字化平台正式上线，为企业提供更强大的数字化能力。',
-    content: '',
-    coverImage: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&h=400&fit=crop',
-    category: '产品动态',
-    author: '管理员',
-    viewCount: 892,
-    publishTime: '2024-03-10',
-    createTime: '2024-03-10',
-    updateTime: '2024-03-10'
-  },
-  {
-    id: 3,
-    title: '2024数字化转型趋势报告发布',
-    summary: '我公司研究院发布最新行业报告，深入解读数字化转型的未来趋势。',
-    content: '',
-    coverImage: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=600&h=400&fit=crop',
-    category: '行业资讯',
-    author: '管理员',
-    viewCount: 654,
-    publishTime: '2024-03-05',
-    createTime: '2024-03-05',
-    updateTime: '2024-03-05'
-  }
-])
+const latestNews = ref(getLatestNews(3))
 
 const statsData = ref([
   { value: '500+', label: '服务客户' },
