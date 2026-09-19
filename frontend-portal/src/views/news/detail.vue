@@ -1,105 +1,116 @@
 <template>
   <div class="news-detail-page">
-    <!-- 文章头部 -->
-    <header class="article-hero">
-      <div class="hero-content">
-        <span class="article-category">{{ newsDetail.category }}</span>
-        <h1>{{ newsDetail.title }}</h1>
-        <div class="article-meta">
-          <span><el-icon><User /></el-icon> {{ newsDetail.author }}</span>
-          <span><el-icon><Calendar /></el-icon> {{ formatDate(newsDetail.publishTime) }}</span>
-          <span><el-icon><View /></el-icon> {{ newsDetail.viewCount }} 阅读</span>
+    <template v-if="newsDetail">
+      <!-- 文章头部 -->
+      <header class="article-hero">
+        <div class="hero-content">
+          <span class="article-category">{{ newsDetail.category }}</span>
+          <h1>{{ newsDetail.title }}</h1>
+          <div class="article-meta">
+            <span><el-icon><User /></el-icon> {{ newsDetail.author }}</span>
+            <span><el-icon><Calendar /></el-icon> {{ formatDate(newsDetail.publishTime) }}</span>
+            <span><el-icon><View /></el-icon> {{ newsDetail.viewCount }} 阅读</span>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
 
-    <div class="detail-container">
-      <!-- 返回按钮 -->
-      <div class="back-nav">
-        <el-button text @click="router.back()">
-          <el-icon><ArrowLeft /></el-icon> 返回列表
-        </el-button>
-      </div>
+      <div class="detail-container">
+        <!-- 返回按钮 -->
+        <div class="back-nav">
+          <el-button text @click="goBackToList">
+            <el-icon><ArrowLeft /></el-icon> 返回列表
+          </el-button>
+        </div>
 
-      <div class="content-wrapper">
-        <!-- 文章主体 -->
-        <article class="article-main">
-          <div class="article-cover">
-            <img :src="newsDetail.coverImage" :alt="newsDetail.title" />
-          </div>
-
-          <div class="article-body">
-            <p class="lead">{{ newsDetail.summary }}</p>
-            <p>
-              这是一篇关于{{ newsDetail.category }}的详细报道。在当今快速发展的时代，
-              我们需要不断学习和适应新的变化。本文将从多个角度深入分析相关话题，
-              为读者提供有价值的参考信息。
-            </p>
-            <h2>背景介绍</h2>
-            <p>
-              随着技术的不断进步，行业正在经历前所未有的变革。企业需要积极拥抱变化，
-              才能在激烈的市场竞争中保持领先地位。我们公司一直致力于技术创新，
-              为客户提供最优质的产品和服务。
-            </p>
-            <h2>核心观点</h2>
-            <p>
-              本次事件的核心在于创新与实践的结合。只有将理论与实际相结合，
-              才能真正实现价值创造。我们相信，通过持续的努力和投入，
-              一定能够取得更大的成就。
-            </p>
-            <h2>未来展望</h2>
-            <p>
-              展望未来，我们充满信心。在全体员工的共同努力下，
-              公司将继续保持高速发展，为客户创造更多价值，
-              为社会做出更大贡献。
-            </p>
-          </div>
-
-          <footer class="article-footer">
-            <div class="article-tags">
-              <span class="tags-label">标签：</span>
-              <el-tag v-for="tag in ['行业动态', '技术创新', '企业发展']" :key="tag" size="small" effect="plain">
-                {{ tag }}
-              </el-tag>
+        <div class="content-wrapper">
+          <!-- 文章主体 -->
+          <article class="article-main">
+            <div class="article-cover">
+              <img :src="newsDetail.coverImage" :alt="newsDetail.title" />
             </div>
-            <div class="article-share">
-              <span>分享：</span>
-              <a @click="handleNotImplemented"><el-icon :size="18"><Share /></el-icon></a>
-              <a @click="handleNotImplemented"><el-icon :size="18"><ChatDotRound /></el-icon></a>
-            </div>
-          </footer>
-        </article>
 
-        <!-- 侧边栏 -->
-        <aside class="article-sidebar">
-          <div class="sidebar-card">
-            <h3>相关推荐</h3>
-            <div class="related-list">
-              <div 
-                v-for="item in relatedNews" 
-                :key="item.id" 
-                class="related-item"
-                @click="router.push(`/news/${item.id}`)"
-              >
-                <img :src="item.coverImage" :alt="item.title" />
-                <div class="related-info">
-                  <h4>{{ item.title }}</h4>
-                  <span>{{ formatDate(item.publishTime) }}</span>
+            <div class="article-body">
+              <p class="lead">{{ newsDetail.summary }}</p>
+              <p>
+                这是一篇关于{{ newsDetail.category }}的详细报道。在当今快速发展的时代，
+                我们需要不断学习和适应新的变化。本文将从多个角度深入分析相关话题，
+                为读者提供有价值的参考信息。
+              </p>
+              <h2>背景介绍</h2>
+              <p>
+                随着技术的不断进步，行业正在经历前所未有的变革。企业需要积极拥抱变化，
+                才能在激烈的市场竞争中保持领先地位。我们公司一直致力于技术创新，
+                为客户提供最优质的产品和服务。
+              </p>
+              <h2>核心观点</h2>
+              <p>
+                本次事件的核心在于创新与实践的结合。只有将理论与实际相结合，
+                才能真正实现价值创造。我们相信，通过持续的努力和投入，
+                一定能够取得更大的成就。
+              </p>
+              <h2>未来展望</h2>
+              <p>
+                展望未来，我们充满信心。在全体员工的共同努力下，
+                公司将继续保持高速发展，为客户创造更多价值，
+                为社会做出更大贡献。
+              </p>
+            </div>
+
+            <footer class="article-footer">
+              <div class="article-tags">
+                <span class="tags-label">标签：</span>
+                <el-tag v-for="tag in ['行业动态', '技术创新', '企业发展']" :key="tag" size="small" effect="plain">
+                  {{ tag }}
+                </el-tag>
+              </div>
+              <div class="article-share">
+                <span>分享：</span>
+                <a @click="handleNotImplemented"><el-icon :size="18"><Share /></el-icon></a>
+                <a @click="handleNotImplemented"><el-icon :size="18"><ChatDotRound /></el-icon></a>
+              </div>
+            </footer>
+          </article>
+
+          <!-- 侧边栏 -->
+          <aside class="article-sidebar">
+            <div class="sidebar-card">
+              <h3>相关推荐</h3>
+              <div class="related-list">
+                <div
+                  v-for="item in relatedNews"
+                  :key="item.id"
+                  class="related-item"
+                  @click="router.push(`/news/${item.id}`)"
+                >
+                  <img :src="item.coverImage" :alt="item.title" />
+                  <div class="related-info">
+                    <h4>{{ item.title }}</h4>
+                    <span>{{ formatDate(item.publishTime) }}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </aside>
+          </aside>
+        </div>
       </div>
+    </template>
+
+    <!-- 文章不存在 -->
+    <div v-else class="detail-empty">
+      <el-empty description="文章不存在或已被删除">
+        <el-button type="primary" round @click="router.push('/news')">
+          返回新闻列表
+        </el-button>
+      </el-empty>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import type { NewsItem } from '@/types'
+import { getNewsById, getRelatedNews } from '@/data/news'
 
 const router = useRouter()
 const route = useRoute()
@@ -108,61 +119,22 @@ const handleNotImplemented = () => {
   ElMessage.info('功能开发中，敬请期待')
 }
 
-const newsDetail = ref<NewsItem>({
-  id: 1,
-  title: '公司荣获2024年度最佳创新企业奖',
-  summary: '在刚刚结束的行业峰会上，我公司凭借卓越的创新能力和优质的产品服务，荣获年度最佳创新企业奖。这是对我们团队辛勤付出的最好肯定，也是对未来发展的巨大鼓励。',
-  content: '',
-  coverImage: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=400&fit=crop',
-  category: '公司新闻',
-  author: '管理员',
-  viewCount: 1256,
-  publishTime: '2024-03-15',
-  createTime: '2024-03-15',
-  updateTime: '2024-03-15'
-})
+// 按地址中的文章 id 展示对应内容；点击相关推荐切换文章时同步更新
+const newsId = computed(() => Number(route.params.id))
+const newsDetail = computed(() => getNewsById(newsId.value))
 
-const relatedNews = ref<NewsItem[]>([
-  {
-    id: 2,
-    title: '新产品发布会圆满成功',
-    summary: '',
-    content: '',
-    coverImage: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=200&h=150&fit=crop',
-    category: '产品动态',
-    author: '管理员',
-    viewCount: 892,
-    publishTime: '2024-03-10',
-    createTime: '2024-03-10',
-    updateTime: '2024-03-10'
-  },
-  {
-    id: 3,
-    title: '行业发展趋势分析报告发布',
-    summary: '',
-    content: '',
-    coverImage: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=200&h=150&fit=crop',
-    category: '行业资讯',
-    author: '管理员',
-    viewCount: 654,
-    publishTime: '2024-03-05',
-    createTime: '2024-03-05',
-    updateTime: '2024-03-05'
-  },
-  {
-    id: 4,
-    title: 'Vue 3 组合式 API 最佳实践',
-    summary: '',
-    content: '',
-    coverImage: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=200&h=150&fit=crop',
-    category: '技术分享',
-    author: '技术团队',
-    viewCount: 2341,
-    publishTime: '2024-03-01',
-    createTime: '2024-03-01',
-    updateTime: '2024-03-01'
+// 相关推荐：只列站内真实存在、且不是当前这篇的文章
+const relatedNews = computed(() => getRelatedNews(newsId.value))
+
+// 返回列表：上一页是新闻列表则回退（保留列表状态与滚动位置），否则回到新闻列表页
+const goBackToList = () => {
+  const back = router.options.history.state.back as string | null
+  if (back === '/news') {
+    router.back()
+  } else {
+    router.push('/news')
   }
-])
+}
 
 const formatDate = (dateStr: string) => {
   return new Date(dateStr).toLocaleDateString('zh-CN', {
@@ -171,10 +143,6 @@ const formatDate = (dateStr: string) => {
     day: 'numeric'
   })
 }
-
-onMounted(() => {
-  console.log('News ID:', route.params.id)
-})
 </script>
 
 <style lang="scss" scoped>
@@ -233,6 +201,13 @@ onMounted(() => {
   max-width: $container-max-width;
   margin: 0 auto;
   padding: $spacing-xl $spacing-lg;
+}
+
+// ==================== 文章不存在 ====================
+.detail-empty {
+  display: flex;
+  justify-content: center;
+  padding: $spacing-4xl $spacing-lg;
 }
 
 .back-nav {
